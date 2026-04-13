@@ -4,8 +4,10 @@
   "type": "module",
   "scripts": {
     "build:catalog": "node scripts/build-catalog.mjs",
+    "build:site": "vite build --config site/vite.config.js",
+    "check": "npm run build",
     "dev": "npm run build:catalog && vite --config site/vite.config.js",
-    "build": "npm run build:catalog && vite build --config site/vite.config.js",
+    "build": "npm run build:catalog && npm run build:site",
     "preview": "vite preview --config site/vite.config.js"
   },
   "dependencies": {
