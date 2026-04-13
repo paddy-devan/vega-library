@@ -325,7 +325,7 @@ pre {
 
 .copy-button--overlay {
   position: absolute;
-  top: 10px;
+  top: 12px;
   right: 24px;
   z-index: 1;
 }
@@ -342,7 +342,8 @@ pre {
 }
 
 .copy-button--overlay + pre {
-  padding-right: 56px;
+  padding-top: 14px;
+  padding-right: 60px;
 }
 
 .sample-table-wrap {
