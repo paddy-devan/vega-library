@@ -1,10 +1,10 @@
 # vega-library
 
-Shared Vega specs for BI teams, with a GitHub Pages gallery generated from the repository's `specs/` folders.
+Shared Vega specs for BI teams, with a GitHub Pages gallery dynamically generated from the repository's `specs/` folders.
 
-## Spec structure
+## Contributing
 
-Each visual lives in its own folder under `specs/`:
+Each visual has its own folder under `specs/`, containing the spec json itself, some sample data (which LLMs are really good at generating), and some meta info for gallery navigation:
 
 ```text
 specs/
@@ -14,7 +14,9 @@ specs/
     sample-data.json
 ```
 
-`meta.json` is used for discovery and filtering in the site.
+Note that the sample data here is used to populate the example gallery.
+
+Everybody is welcome to create a PR with their own folder, copying the structure of an existing one!
 
 ## Local development
 
@@ -23,7 +25,7 @@ npm install
 npm run dev
 ```
 
-## Build
+### Build
 
 ```bash
 npm run build
