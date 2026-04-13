@@ -23,10 +23,16 @@ function withDataset(spec, sampleData) {
 
 function withPreviewDimensions(spec, previewNode) {
   const nextSpec = cloneJson(spec);
-  const containerWidth = previewNode.clientWidth || previewNode.parentElement?.clientWidth || 0;
+  const styles = window.getComputedStyle(previewNode);
+  const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0;
+  const paddingRight = Number.parseFloat(styles.paddingRight) || 0;
+  const innerWidth =
+    previewNode.clientWidth - paddingLeft - paddingRight ||
+    previewNode.parentElement?.clientWidth ||
+    0;
 
   // Keep the preview usable for wider gantt-style charts even on narrow layouts.
-  nextSpec.width = Math.max(760, containerWidth - 36);
+  nextSpec.width = Math.max(760, innerWidth);
   nextSpec.height = 560;
 
   return nextSpec;
@@ -163,7 +169,9 @@ function renderDetail(spec) {
           </div>
         </div>
       </div>
-      <div id="vega-preview" class="preview-shell"></div>
+      <div id="vega-preview" class="preview-shell">
+        <div id="vega-preview-frame" class="preview-frame"></div>
+      </div>
       <div class="inspect-sections">
         <details class="inspect-section">
           <summary>Show metadata</summary>
@@ -218,17 +226,19 @@ function attachEvents(root) {
 }
 
 async function renderPreview(selectedSpec) {
-  const previewNode = document.querySelector("#vega-preview");
-  if (!previewNode || !selectedSpec) {
+  const previewShell = document.querySelector("#vega-preview");
+  const previewFrame = document.querySelector("#vega-preview-frame");
+
+  if (!previewShell || !previewFrame || !selectedSpec) {
     return;
   }
 
   const previewSpec = withPreviewDimensions(
     withDataset(selectedSpec.spec, selectedSpec.sampleData),
-    previewNode,
+    previewShell,
   );
 
-  await embed(previewNode, previewSpec, {
+  await embed(previewFrame, previewSpec, {
     actions: false,
     renderer: "svg",
   });

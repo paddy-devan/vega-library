@@ -225,6 +225,12 @@ pre {
   overflow: auto;
 }
 
+.preview-frame {
+  width: max-content;
+  min-width: 100%;
+  margin: 0 auto;
+}
+
 .inspect-sections {
   display: grid;
   gap: 8px;
