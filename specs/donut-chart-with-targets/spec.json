@@ -1,0 +1,143 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Concentric donut charts for multiple measures",
+  "autosize": {"type": "fit", "contains": "padding"},
+  "signals": [
+    {"name": "tau", "value": 6.2831853},
+    {"name": "halfPi", "value": 1.5707963},
+
+    {
+      "name": "outerRadius",
+      "update": "min(width, height) / 2"
+    },
+
+    {
+      "name": "scale",
+      "update": "outerRadius / 80"
+    },
+
+    {
+      "name": "ringWidth",
+      "update": "15 * scale"
+    },
+    {
+      "name": "padding",
+      "update": "3 * scale"
+    },
+    {
+      "name": "cornerRadius",
+      "update": "5.5 * scale"
+    },
+
+    {
+      "name": "cx",
+      "update": "outerRadius"
+    },
+    {
+      "name": "cy",
+      "update": "outerRadius"
+    },
+
+    {
+      "name": "colors",
+      "value": ["#00A19C", "#FFB81B", "#AE2574"]
+    },
+    {
+      "name": "targets",
+      "value": [0.78, 0.7, 0.9]
+    }
+  ],
+
+  "data": [
+    {
+      "name": "dataset",
+      "transform": [
+        {
+          "type": "fold",
+          "fields": ["measure_1", "measure_2", "measure_3"],
+          "as": ["measure", "value"]
+        },
+        {
+          "type": "window",
+          "ops": ["row_number"],
+          "as": ["index"]
+        },
+        {
+          "type": "formula",
+          "as": "innerRadius",
+          "expr": "outerRadius - ringWidth - (datum.index - 1) * (ringWidth + padding)"
+        },
+        {
+          "type": "formula",
+          "as": "outerRadiusOffset",
+          "expr": "outerRadius - (datum.index - 1) * (ringWidth + padding)"
+        }
+      ]
+    }
+  ],
+
+  "marks": [
+    {
+      "name": "unfilled segment",
+      "type": "arc",
+      "from": {"data": "dataset"},
+      "encode": {
+        "enter": {
+          "fill": {"signal": "colors[datum.index - 1]"},
+          "fillOpacity": {"value": 0.12},
+          "x": {"signal": "cx"},
+          "y": {"signal": "cy"}
+        },
+        "update": {
+          "startAngle": {"value": 0},
+          "endAngle": {"signal": "tau"},
+          "innerRadius": {"signal": "datum.innerRadius"},
+          "outerRadius": {"signal": "datum.outerRadiusOffset"}
+        }
+      }
+    },
+    {
+      "name": "filled segment",
+      "type": "arc",
+      "from": {"data": "dataset"},
+      "encode": {
+        "enter": {
+          "fill": {"signal": "colors[datum.index - 1]"},
+          "x": {"signal": "cx"},
+          "y": {"signal": "cy"}
+        },
+        "update": {
+          "startAngle": {"value": 0},
+          "endAngle": {"signal": "datum.value * tau"},
+          "innerRadius": {"signal": "datum.innerRadius"},
+          "outerRadius": {"signal": "datum.outerRadiusOffset"},
+          "cornerRadius": {"signal": "cornerRadius"}
+        }
+      }
+    },
+    {
+      "name": "target markers",
+      "type": "rule",
+      "from": {"data": "dataset"},
+      "encode": {
+        "enter": {
+          "stroke": {"value": "#00CCFF"},
+          "opacity": {"value": 1},
+          "strokeWidth": {"signal": "max(1, 2 * scale)"},
+          "x": {
+            "signal": "cx + (datum.innerRadius - padding/2) * cos(targets[datum.index - 1] * tau - halfPi)"
+          },
+          "y": {
+            "signal": "cy + (datum.innerRadius - padding/2) * sin(targets[datum.index - 1] * tau - halfPi)"
+          },
+          "x2": {
+            "signal": "cx + (datum.outerRadiusOffset + padding/2) * cos(targets[datum.index - 1] * tau - halfPi)"
+          },
+          "y2": {
+            "signal": "cy + (datum.outerRadiusOffset + padding/2) * sin(targets[datum.index - 1] * tau - halfPi)"
+          }
+        }
+      }
+    }
+  ]
+}

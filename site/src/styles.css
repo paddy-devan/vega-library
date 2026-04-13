@@ -299,15 +299,10 @@ pre {
 }
 
 .inspector-content {
+  position: relative;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
-}
-
-.inspector-content__actions {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 10px 0;
 }
 
 .copy-button {
@@ -328,6 +323,13 @@ pre {
   height: 15px;
 }
 
+.copy-button--overlay {
+  position: absolute;
+  top: 12px;
+  right: 24px;
+  z-index: 1;
+}
+
 .inspector-content pre {
   margin: 0;
   max-height: 420px;
@@ -337,6 +339,49 @@ pre {
   color: var(--text);
   line-height: 1.5;
   font-size: 0.88rem;
+}
+
+.copy-button--overlay + pre {
+  padding-top: 14px;
+  padding-right: 60px;
+}
+
+.sample-table-wrap {
+  max-height: 420px;
+  overflow: auto;
+}
+
+.sample-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.sample-table th,
+.sample-table td {
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.sample-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 600;
+  border-top: 0;
+}
+
+.sample-table tbody td {
+  color: var(--muted);
+}
+
+.sample-table-empty {
+  padding: 14px;
+  color: var(--muted);
 }
 
 .empty-state {
