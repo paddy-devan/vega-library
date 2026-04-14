@@ -9,6 +9,10 @@ const state = {
   inspectorTab: null,
 };
 
+const viewState = {
+  selectedSlug: null,
+};
+
 let resizeFrame = null;
 const repo = {
   name: "vega-library",
@@ -63,6 +67,10 @@ function findSelectedSpec(specs) {
   }
 
   return specs[0] ?? null;
+}
+
+function getSelectedSpec(specs) {
+  return findSelectedSpec(specs) ?? findSelectedSpec(catalog.specs);
 }
 
 function readHashSlug() {
@@ -197,27 +205,6 @@ function renderDetail(spec) {
     `;
   }
 
-  const sampleData = JSON.stringify(spec.sampleData, null, 2);
-  const vegaSpec = JSON.stringify(spec.spec, null, 2);
-  const metadata = JSON.stringify({
-    title: spec.title,
-    slug: spec.slug,
-    category: spec.category,
-    description: spec.description,
-    tags: spec.tags,
-  }, null, 2);
-  const tabs = [
-    { id: "spec", label: "Spec JSON" },
-    { id: "sample", label: "Sample Data" },
-    { id: "meta", label: "Metadata" },
-  ];
-  const selectedTab = tabs.find((tab) => tab.id === state.inspectorTab) ?? null;
-  const tabContent = {
-    spec: vegaSpec,
-    sample: renderSampleDataTable(spec.sampleData),
-    meta: metadata,
-  };
-
   return `
     <section class="detail-panel">
       <div class="detail-panel__header">
@@ -238,8 +225,6 @@ function renderDetail(spec) {
 }
 
 function renderInspector(spec) {
-  const sampleData = JSON.stringify(spec.sampleData, null, 2);
-  const vegaSpec = JSON.stringify(spec.spec, null, 2);
   const metadata = JSON.stringify({
     title: spec.title,
     slug: spec.slug,
@@ -254,7 +239,7 @@ function renderInspector(spec) {
   ];
   const selectedTab = tabs.find((tab) => tab.id === state.inspectorTab) ?? null;
   const tabContent = {
-    spec: vegaSpec,
+    spec: JSON.stringify(spec.spec, null, 2),
     sample: renderSampleDataTable(spec.sampleData),
     meta: metadata,
   };
@@ -320,52 +305,17 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;");
 }
 
-function attachEvents(root, selectedSpec) {
-  root.querySelector("#search-input")?.addEventListener("input", (event) => {
-    state.query = event.target.value;
-    render();
-  });
-
-  root.querySelectorAll("[data-category]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.category = button.dataset.category;
-      render();
-    });
-  });
-
-  root.querySelectorAll("[data-slug]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.slug = button.dataset.slug;
-      updateHash(state.slug);
-      render();
-    });
-  });
-
-  root.querySelectorAll("[data-inspector-tab]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.inspectorTab =
-        state.inspectorTab === button.dataset.inspectorTab ? null : button.dataset.inspectorTab;
-      renderInspectorPanel(selectedSpec);
-    });
-  });
-
-  root.querySelector("[data-copy-spec='true']")?.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(JSON.stringify(selectedSpec.spec, null, 2));
-  });
+function getShell() {
+  return {
+    filters: document.querySelector("#filters-slot"),
+    list: document.querySelector("#spec-list-slot"),
+    detail: document.querySelector("#detail-slot"),
+  };
 }
 
-function attachInspectorEvents(root, selectedSpec) {
-  root.querySelectorAll("[data-inspector-tab]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.inspectorTab =
-        state.inspectorTab === button.dataset.inspectorTab ? null : button.dataset.inspectorTab;
-      renderInspectorPanel(selectedSpec);
-    });
-  });
-
-  root.querySelector("[data-copy-spec='true']")?.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(JSON.stringify(selectedSpec.spec, null, 2));
-  });
+function getSelectedSpecFromView() {
+  const specs = getSpecs();
+  return getSelectedSpec(specs);
 }
 
 function renderInspectorPanel(selectedSpec) {
@@ -375,7 +325,6 @@ function renderInspectorPanel(selectedSpec) {
   }
 
   inspectorPanel.innerHTML = renderInspector(selectedSpec);
-  attachInspectorEvents(inspectorPanel, selectedSpec);
 }
 
 async function renderPreview(selectedSpec) {
@@ -433,11 +382,8 @@ function renderRepoWidget() {
   `;
 }
 
-async function render() {
+function mountApp() {
   const root = document.querySelector("#app");
-  const specs = getSpecs();
-  const selectedSpec = findSelectedSpec(specs) ?? findSelectedSpec(catalog.specs);
-
   root.innerHTML = `
     <div class="page-shell">
       <header class="site-header">
@@ -449,21 +395,106 @@ async function render() {
           ${renderRepoWidget()}
         </div>
       </header>
-      ${renderFilters()}
+      <div id="filters-slot">${renderFilters()}</div>
       <main class="content-grid">
-        ${renderSpecList(specs, selectedSpec)}
-        ${renderDetail(selectedSpec)}
+        <div id="spec-list-slot"></div>
+        <div id="detail-slot"></div>
       </main>
     </div>
   `;
 
-  attachEvents(root, selectedSpec);
-  await renderPreview(selectedSpec);
+  attachEvents(root);
 }
 
-window.addEventListener("hashchange", () => {
+function updateFiltersUI() {
+  const searchInput = document.querySelector("#search-input");
+  if (searchInput && searchInput.value !== state.query) {
+    searchInput.value = state.query;
+  }
+
+  document.querySelectorAll("[data-category]").forEach((button) => {
+    const isActive = button.dataset.category === state.category;
+    button.classList.toggle("is-active", isActive);
+  });
+}
+
+function attachEvents(root) {
+  root.addEventListener("input", (event) => {
+    if (event.target.id !== "search-input") {
+      return;
+    }
+
+    state.query = event.target.value;
+    updateView();
+  });
+
+  root.addEventListener("click", async (event) => {
+    const categoryButton = event.target.closest("[data-category]");
+    if (categoryButton) {
+      state.category = categoryButton.dataset.category;
+      updateView();
+      return;
+    }
+
+    const specButton = event.target.closest("[data-slug]");
+    if (specButton) {
+      state.slug = specButton.dataset.slug;
+      updateHash(state.slug);
+      await updateView();
+      return;
+    }
+
+    const inspectorButton = event.target.closest("[data-inspector-tab]");
+    if (inspectorButton) {
+      state.inspectorTab =
+        state.inspectorTab === inspectorButton.dataset.inspectorTab
+          ? null
+          : inspectorButton.dataset.inspectorTab;
+      renderInspectorPanel(getSelectedSpecFromView());
+      return;
+    }
+
+    const copyButton = event.target.closest("[data-copy-spec='true']");
+    if (copyButton) {
+      const selectedSpec = getSelectedSpecFromView();
+      if (selectedSpec) {
+        await navigator.clipboard.writeText(JSON.stringify(selectedSpec.spec, null, 2));
+      }
+    }
+  });
+}
+
+async function updateView() {
+  const shell = getShell();
+  const specs = getSpecs();
+  const selectedSpec = getSelectedSpec(specs);
+  const selectedChanged = viewState.selectedSlug !== selectedSpec?.slug;
+
+  if (shell.filters) {
+    updateFiltersUI();
+  }
+
+  if (shell.list) {
+    shell.list.innerHTML = renderSpecList(specs, selectedSpec);
+  }
+
+  if (shell.detail && (selectedChanged || !shell.detail.innerHTML.trim())) {
+    shell.detail.innerHTML = renderDetail(selectedSpec);
+    viewState.selectedSlug = selectedSpec?.slug ?? null;
+    await renderPreview(selectedSpec);
+    return;
+  }
+
+  viewState.selectedSlug = selectedSpec?.slug ?? null;
+}
+
+async function rerenderPreview() {
+  await renderPreview(getSelectedSpecFromView());
+}
+
+window.addEventListener("hashchange", async () => {
   readHashSlug();
-  render();
+  await updateView();
 });
 
 window.addEventListener("resize", () => {
@@ -471,11 +502,12 @@ window.addEventListener("resize", () => {
     window.cancelAnimationFrame(resizeFrame);
   }
 
-  resizeFrame = window.requestAnimationFrame(() => {
+  resizeFrame = window.requestAnimationFrame(async () => {
     resizeFrame = null;
-    render();
+    await rerenderPreview();
   });
 });
 
 readHashSlug();
-render();
+mountApp();
+updateView();
