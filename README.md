@@ -20,15 +20,18 @@ Everybody is welcome to create a PR with their own folder, copying the structure
 
 ## Local development
 
+Before you start, install Node.js, which includes `npm`. Verify your install:
 ```bash
+node -v
+npm -v
+```
+
+Make changes to the codebase and preview them:
+
+```bash
+# install dependencies
 npm install
+
+# preview site locally with hot reloading
 npm run dev
 ```
-
-### Build
-
-```bash
-npm run build
-```
-
-The build first validates and compiles a generated catalog from `specs/`, then builds the static site into `dist/`.
