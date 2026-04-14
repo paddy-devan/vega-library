@@ -133,7 +133,7 @@
     /* y-domain that reacts to pan and zooming */
     {
       "name": "yDom",
-      "value": [0, 24],
+      "init": "[domainMin, domainMax]",
       "on": [
         {
           "events": [
