@@ -1,50 +1,50 @@
 {
-	"$schema": "https://vega.github.io/schema/vega/v5.json",
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
 
-	"data": [
-		{"name": "dataset"},
-		{
-			"name": "positions",
-			"source": "dataset",
-			"transform": [
-				{
-					"type": "formula",
-					"as": "startHour",
-					"expr": "hours(datum.slot_start_at) + minutes(datum.slot_start_at)/60"
-				},
-				{
-					"type": "formula",
-					"as": "endHour",
-					"expr": "hours(datum.slot_end_at) + minutes(datum.slot_end_at)/60"
-				},
-				{
+  "data": [
+    {"name": "dataset"},
+    {
+      "name": "positions",
+      "source": "dataset",
+      "transform": [
+        {
+          "type": "formula",
+          "as": "startHour",
+          "expr": "hours(datum.slot_start_at) + minutes(datum.slot_start_at)/60"
+        },
+        {
+          "type": "formula",
+          "as": "endHour",
+          "expr": "hours(datum.slot_end_at) + minutes(datum.slot_end_at)/60"
+        },
+        {
           "type": "formula",
           "as": "midHour",
           "expr": "(datum.startHour + datum.endHour) / 2"
         }
-			]
-		},
-		{
-			"name": "extents",
-			"source": "positions",
-			"transform": [
-				{
-					"type": "aggregate",
-					"ops": ["min", "max"],
-					"fields": ["startHour", "endHour"],
-					"as": ["minStart", "maxEnd"]
-				}
-			]
-		}
-	],
+      ]
+    },
+    {
+      "name": "extents",
+      "source": "positions",
+      "transform": [
+        {
+          "type": "aggregate",
+          "ops": ["min", "max"],
+          "fields": ["startHour", "endHour"],
+          "as": ["minStart", "maxEnd"]
+        }
+      ]
+    }
+  ],
 
-	"signals": [
+  "signals": [
 
     /* calculate dynamix y-axis limits */
     /* note: if no data, default to 0-24 hours */
     {
       "name": "rawMin",
-      "update": "data('extents').length ? data('extents')[0].minStart : 0" 
+      "update": "data('extents').length ? data('extents')[0].minStart : 0"
     },
     {
       "name": "rawMax",
@@ -94,7 +94,7 @@
                 },
                 {
                   "source": "window",
-                  "type": "pointerup" 
+                  "type": "pointerup"
                 }
               ],
               "throttle": 16
@@ -129,6 +129,34 @@
         { "events": "wheel", "update": "invert('yscale', clamp(y(), 0, height))" }
       ]
     },
+    {
+      "name": "minVisibleHours",
+      "value": 0.5
+    },
+    {
+      "name": "zoomedY0",
+      "update": "max(domainMin, anchorY + (yDom[0] - anchorY) * zoomY)"
+    },
+    {
+      "name": "zoomedY1",
+      "update": "min(domainMax, anchorY + (yDom[1] - anchorY) * zoomY)"
+    },
+    {
+      "name": "zoomedSpan",
+      "update": "zoomedY1 - zoomedY0"
+    },
+    {
+      "name": "zoomedMid",
+      "update": "(zoomedY0 + zoomedY1) / 2"
+    },
+    {
+      "name": "clampedZoomY0",
+      "update": "max(domainMin, min(domainMax - minVisibleHours, zoomedMid - minVisibleHours / 2))"
+    },
+    {
+      "name": "clampedZoomY1",
+      "update": "min(domainMax, max(domainMin + minVisibleHours, zoomedMid + minVisibleHours / 2))"
+    },
 
     /* y-domain that reacts to pan and zooming */
     {
@@ -148,7 +176,7 @@
         },
         {
           "events": "wheel!",
-          "update": "[ max(domainMin, anchorY + (yDom[0] - anchorY) * zoomY), min(domainMax, anchorY + (yDom[1] - anchorY) * zoomY) ]"
+          "update": "zoomedSpan < minVisibleHours ? [clampedZoomY0, clampedZoomY1] : [zoomedY0, zoomedY1]"
         }
       ]
     },
@@ -166,52 +194,51 @@
       "name": "stepH",
       "update": "pxPerHour < tickMinPx ? 1 : pxPerHour*0.5 < tickMinPx ? 0.5 : pxPerHour*0.25 < tickMinPx ? 0.25 : pxPerHour*(1/6) < tickMinPx ? 1/6 : 1/12"
     }
-  ]
-  ,
+  ],
 
-	"scales": [
-		{
-			"name": "xscale",
-			"type": "band",
-			"domain": {"data": "positions", "field": "resource_id"},
-			"range": "width",
-			"padding": 0.15
-		},
-		{
-			"name": "yscale",
-			"type": "linear",
-			"domain": {"signal": "yDom"},
-			"range": [ 0, {"signal": "height"} ],
-			"zero": false
-		}
-	],
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "positions", "field": "resource_id"},
+      "range": "width",
+      "padding": 0.15
+    },
+    {
+      "name": "yscale",
+      "type": "linear",
+      "domain": {"signal": "yDom"},
+      "range": [ 0, {"signal": "height"} ],
+      "zero": false
+    }
+  ],
 
-	"axes": [
-		{
+  "axes": [
+    {
       "orient": "top",
       "scale": "xscale"
     },
-		{
-			"orient": "left",
-			"scale": "yscale",
-			"values": {
-				"signal": "sequence(ceil(yDom[0]/stepH)*stepH, floor(yDom[1]/stepH)*stepH + stepH, stepH)"
-			},
-			"tickCount": 25,
-			"encode": {
-				"labels": {
-					"update": {
-						"text": {
-							"signal": "format(floor((round(datum.value*60 - 1e-6))/60), '02') + ':' + format((round(datum.value*60 - 1e-6)) % 60, '02')"
-						}
-					}
-				}
-			}
-		}
-	],
+    {
+      "orient": "left",
+      "scale": "yscale",
+      "values": {
+        "signal": "sequence(ceil(yDom[0]/stepH)*stepH, floor(yDom[1]/stepH)*stepH + stepH, stepH)"
+      },
+      "tickCount": 25,
+      "encode": {
+        "labels": {
+          "update": {
+            "text": {
+              "signal": "format(floor((round(datum.value*60 - 1e-6))/60), '02') + ':' + format((round(datum.value*60 - 1e-6)) % 60, '02')"
+            }
+          }
+        }
+      }
+    }
+  ],
 
-	"marks": [
-		{
+  "marks": [
+    {
       "name": "slot rectangles",
       "type": "rect",
       "clip": true,
@@ -243,35 +270,35 @@
         }
       }
     },
-		{
-			"name": "slot name labels",
+    {
+      "name": "slot name labels",
       "type": "text",
-			"clip": true,
-			"from": {"data": "positions"},
-			"encode": {
-				"update": {
-					"x": {
+      "clip": true,
+      "from": {"data": "positions"},
+      "encode": {
+        "update": {
+          "x": {
             "scale": "xscale",
             "field": "resource_id",
             "band": 0.5
           },
-					"y": {
+          "y": {
             "scale": "yscale",
             "field": "midHour"
           },
-					"align": {"value": "center"},
-					"baseline": {"value": "middle"},
-					"fill": {"value": "white"},
-					"text": {"field": "slot_name"},
-					"fontSize": {"value": 11},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fill": {"value": "white"},
+          "text": {"field": "slot_name"},
+          "fontSize": {"value": 11},
           "limit": {"signal": "bandwidth('xscale') - 6"},
           "ellipsis": {"value": "…"}
-				}
-			}
-		}
-	],
+        }
+      }
+    }
+  ],
 
-	"config": {
+  "config": {
     "axis": {"grid": true},
     "view": {"stroke": null}
   }
