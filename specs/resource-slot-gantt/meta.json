@@ -1,6 +1,6 @@
 {
   "title": "Resource Slot Gantt",
   "category": "Scheduling",
-  "description": "Shows appointment slots per resource across a day",
-  "tags": ["gantt", "appointments", "capacity"]
+  "description": "Shows appointment slots per resource across a day. Pan and zoom by scroll and dragging vertically.",
+  "tags": ["gantt", "appointments"]
 }

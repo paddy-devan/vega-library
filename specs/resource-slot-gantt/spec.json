@@ -40,7 +40,7 @@
 
   "signals": [
 
-    /* calculate dynamix y-axis limits */
+    /* calculate dynamic y-axis limits */
     /* note: if no data, default to 0-24 hours */
     {
       "name": "rawMin",
@@ -73,7 +73,7 @@
       "value": null,
       "on": [
         {
-          "events": "pointerdown, touchstart, touchend",
+          "events": "pointerdown, touchstart",
           "update": "slice(yDom)"
         }
       ]
@@ -156,22 +156,6 @@
     {
       "name": "clampedZoomY1",
       "update": "min(domainMax, max(domainMin + minVisibleHours, zoomedMid + minVisibleHours / 2))"
-    },
-    {
-      "name": "panSpan",
-      "update": "ycur ? ycur[1] - ycur[0] : yDom[1] - yDom[0]"
-    },
-    {
-      "name": "panY0",
-      "update": "ycur ? ycur[0] - panSpan * deltaY / height : yDom[0]"
-    },
-    {
-      "name": "clampedPanY0",
-      "update": "min(domainMax - panSpan, max(domainMin, panY0))"
-    },
-    {
-      "name": "clampedPanY1",
-      "update": "clampedPanY0 + panSpan"
     },
     
     /* y-domain that reacts to pan and zooming */
