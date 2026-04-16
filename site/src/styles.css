@@ -379,6 +379,12 @@ pre {
   color: var(--muted);
 }
 
+.input-table th:last-child,
+.input-table td:last-child {
+  min-width: 260px;
+  white-space: normal;
+}
+
 .sample-table-empty {
   padding: 14px;
   color: var(--muted);
