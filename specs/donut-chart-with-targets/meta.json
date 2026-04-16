@@ -2,5 +2,22 @@
   "title": "Donut Gauge (Apple Rings)",
   "category": "KPIs",
   "description": "Fun apple watch style visualisation of percentage values.",
-  "tags": ["kpi"]
+  "tags": ["kpi"],
+  "inputs": [
+    {
+      "name": "measure_1",
+      "type": "number",
+      "description": "First percentage value to render as the outer ring. Supply as a decimal between 0 and 1."
+    },
+    {
+      "name": "measure_2",
+      "type": "number",
+      "description": "Second percentage value to render as the middle ring. Supply as a decimal between 0 and 1."
+    },
+    {
+      "name": "measure_3",
+      "type": "number",
+      "description": "Third percentage value to render as the inner ring. Supply as a decimal between 0 and 1."
+    }
+  ]
 }

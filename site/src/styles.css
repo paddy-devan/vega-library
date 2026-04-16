@@ -9,6 +9,7 @@
   --muted: #666666;
   --accent: #1f5aa6;
   --accent-soft: #eef4fb;
+  --inspector-gap: 12px;
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 
@@ -273,14 +274,14 @@ pre {
 }
 
 .inspector-panel {
-  margin-top: 12px;
+  margin-top: var(--inspector-gap);
 }
 
 .inspector-tabs {
   display: flex;
   gap: 8px;
   justify-content: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: var(--inspector-gap);
 }
 
 .inspector-tab {
@@ -303,6 +304,7 @@ pre {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  overflow: hidden;
 }
 
 .copy-button {
@@ -335,6 +337,7 @@ pre {
   max-height: 420px;
   overflow: auto;
   padding: 14px;
+  border-radius: inherit;
   background: var(--panel);
   color: var(--text);
   line-height: 1.5;
@@ -349,6 +352,7 @@ pre {
 .sample-table-wrap {
   max-height: 420px;
   overflow: auto;
+  border-radius: inherit;
 }
 
 .sample-table {
@@ -377,6 +381,12 @@ pre {
 
 .sample-table tbody td {
   color: var(--muted);
+}
+
+.input-table th:last-child,
+.input-table td:last-child {
+  min-width: 260px;
+  white-space: normal;
 }
 
 .sample-table-empty {

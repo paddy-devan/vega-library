@@ -194,6 +194,43 @@ function renderSampleDataTable(rows) {
   `;
 }
 
+function renderInputsTable(inputs) {
+  if (!Array.isArray(inputs) || inputs.length === 0) {
+    return `
+      <div class="sample-table-empty">
+        <p>No input fields documented.</p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="sample-table-wrap">
+      <table class="sample-table input-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${inputs
+            .map(
+              (input) => `
+                <tr>
+                  <td><code>${escapeHtml(String(input.name ?? ""))}</code></td>
+                  <td><code>${escapeHtml(String(input.type ?? ""))}</code></td>
+                  <td>${escapeHtml(String(input.description ?? ""))}</td>
+                </tr>
+              `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderDetail(spec) {
   if (!spec) {
     return `
@@ -225,23 +262,16 @@ function renderDetail(spec) {
 }
 
 function renderInspector(spec) {
-  const metadata = JSON.stringify({
-    title: spec.title,
-    slug: spec.slug,
-    category: spec.category,
-    description: spec.description,
-    tags: spec.tags,
-  }, null, 2);
   const tabs = [
     { id: "spec", label: "Spec JSON" },
+    { id: "inputs", label: "Inputs" },
     { id: "sample", label: "Sample Data" },
-    { id: "meta", label: "Metadata" },
   ];
   const selectedTab = tabs.find((tab) => tab.id === state.inspectorTab) ?? null;
   const tabContent = {
     spec: JSON.stringify(spec.spec, null, 2),
     sample: renderSampleDataTable(spec.sampleData),
-    meta: metadata,
+    inputs: renderInputsTable(spec.inputs),
   };
 
   return `
@@ -289,6 +319,8 @@ function renderInspector(spec) {
             ${
               selectedTab.id === "sample"
                 ? tabContent.sample
+                : selectedTab.id === "inputs"
+                  ? tabContent.inputs
                 : `<pre>${escapeHtml(tabContent[selectedTab.id])}</pre>`
             }
           </div>
