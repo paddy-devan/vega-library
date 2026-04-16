@@ -1,4 +1,4 @@
-# vega-library
+# nhs-vega-library
 
 Shared Vega specs for BI teams, with a GitHub Pages gallery dynamically generated from the repository's `specs/` folders.
 
@@ -35,3 +35,5 @@ npm install
 # preview site locally with hot reloading
 npm run dev
 ```
+
+Note that whilst changes to site layout will be hot-reloaded using `npm run dev`, changes to vega specs won't. To preview spec changes, end the current preview with `ctrl-c`, then run `npm run dev` again.

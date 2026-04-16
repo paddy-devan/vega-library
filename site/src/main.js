@@ -15,11 +15,11 @@ const viewState = {
 
 let resizeFrame = null;
 const repo = {
-  name: "vega-library",
-  fullName: "paddy-devan/vega-library",
-  url: "https://github.com/paddy-devan/vega-library",
+  name: "nhs-vega-library",
+  fullName: "paddy-devan/nhs-vega-library",
+  url: "https://github.com/paddy-devan/nhs-vega-library",
   starsBadge:
-    "https://img.shields.io/github/stars/paddy-devan/vega-library?style=flat&label=&color=171717",
+    "https://img.shields.io/github/stars/paddy-devan/nhs-vega-library?style=flat&label=&color=171717",
 };
 
 function cloneJson(value) {
@@ -388,7 +388,7 @@ function mountApp() {
     <div class="page-shell">
       <header class="site-header">
         <div class="site-header__copy">
-          <h1>Vega Library</h1>
+          <h1>NHS Vega Library</h1>
           <p>Shared Vega visuals for BI teams across trusts.</p>
         </div>
         <div class="site-header__aside">
