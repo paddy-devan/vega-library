@@ -264,8 +264,8 @@ function renderDetail(spec) {
 function renderInspector(spec) {
   const tabs = [
     { id: "spec", label: "Spec JSON" },
-    { id: "sample", label: "Sample Data" },
     { id: "inputs", label: "Inputs" },
+    { id: "sample", label: "Sample Data" },
   ];
   const selectedTab = tabs.find((tab) => tab.id === state.inspectorTab) ?? null;
   const tabContent = {
