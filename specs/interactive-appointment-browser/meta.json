@@ -1,7 +1,7 @@
 {
-  "title": "Resource Slot Gantt",
+  "title": "Interactive Appointment Browser",
   "category": "Scheduling",
-  "description": "Shows appointment slots per resource across a day. Pan and zoom by scroll and dragging vertically.",
+  "description": "Browse appointment slots by resource, with pan and zooming.",
   "tags": ["gantt", "appointments"],
   "inputs": [
     {
