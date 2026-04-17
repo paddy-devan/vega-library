@@ -241,6 +241,40 @@ pre {
   margin-bottom: 12px;
 }
 
+.detail-panel__intro {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.detail-panel__title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.meta-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 9px;
+  border: 1px solid var(--tag-border);
+  border-radius: 999px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .detail-stats {
   display: flex;
   gap: 16px;
@@ -429,6 +463,15 @@ pre {
   .spec-card__header {
     flex-direction: column;
     gap: 4px;
+  }
+
+  .detail-panel__title-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-pill-row {
+    justify-content: flex-start;
   }
 
   .site-header__aside {

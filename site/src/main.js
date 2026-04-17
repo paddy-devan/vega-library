@@ -253,6 +253,28 @@ function renderInputsTable(inputs) {
   `;
 }
 
+function getPastelTagStyle(label) {
+  const hash = Array.from(label).reduce(
+    (value, character) => value + character.charCodeAt(0),
+    0,
+  );
+  const hue = hash % 360;
+  return `--tag-bg: hsl(${hue} 78% 92%); --tag-text: hsl(${hue} 45% 28%); --tag-border: hsl(${hue} 62% 82%);`;
+}
+
+function renderMetaPills(spec) {
+  return (Array.isArray(spec.tags) ? spec.tags : [])
+    .filter(Boolean)
+    .map(
+      (tag) => `
+        <span class="meta-pill" style="${getPastelTagStyle(String(tag))}">
+          ${escapeHtml(String(tag))}
+        </span>
+      `,
+    )
+    .join("");
+}
+
 function renderDetail(spec) {
   if (!spec) {
     return `
@@ -267,9 +289,13 @@ function renderDetail(spec) {
   return `
     <section class="detail-panel">
       <div class="detail-panel__header">
-        <div>
-          <div class="eyebrow">${spec.category}</div>
-          <h2>${spec.title}</h2>
+        <div class="detail-panel__intro">
+          <div class="detail-panel__title-row">
+            <h2>${spec.title}</h2>
+            <div class="meta-pill-row" aria-label="Visual metadata">
+              ${renderMetaPills(spec)}
+            </div>
+          </div>
           <p>${spec.description}</p>
         </div>
       </div>
