@@ -5,24 +5,49 @@
   "tags": ["gantt", "appointments", "theatres", "operations"],
   "inputs": [
     {
-      "name": "resource_id",
-      "type": "string",
-      "description": "Resource, room, clinician, or other entity shown as a column."
-    },
-    {
-      "name": "slot_name",
-      "type": "string",
-      "description": "Display label shown inside each slot and in the slot tooltip."
-    },
-    {
-      "name": "slot_start_at",
+      "name": "case_start",
       "type": "datetime",
-      "description": "Start timestamp for the slot."
+      "description": "Start timestamp for the case. Use null when a case has not yet started."
     },
     {
-      "name": "slot_end_at",
+      "name": "case_end",
       "type": "datetime",
-      "description": "End timestamp for the slot."
+      "description": "End timestamp for the case. Use null when the case is still in progress."
+    },
+    {
+      "name": "case_status",
+      "type": "string",
+      "description": "Current case status used for bar colour, for example Complete or In Progress."
+    },
+    {
+      "name": "case_procedure",
+      "type": "string",
+      "description": "Procedure or case label shown in the case tooltip."
+    },
+    {
+      "name": "session_start",
+      "type": "datetime",
+      "description": "Planned session start timestamp for the theatre session band."
+    },
+    {
+      "name": "session_end",
+      "type": "datetime",
+      "description": "Planned session end timestamp for the theatre session band."
+    },
+    {
+      "name": "session_theatre",
+      "type": "string",
+      "description": "Theatre or lane name shown on the y-axis."
+    },
+    {
+      "name": "session_key",
+      "type": "string",
+      "description": "Session identifier shown in the session band tooltip, for example THR1_AM or THR1_ALLDAY."
+    },
+    {
+      "name": "last_refresh_dttm",
+      "type": "datetime",
+      "description": "Timestamp of the latest data refresh. Used to position the vertical live-status marker and cap in-progress cases."
     }
   ]
 }
