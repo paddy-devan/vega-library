@@ -163,7 +163,6 @@ function renderSpecList(specs, selectedSpec) {
         >
           <div class="spec-card__header">
             <h2>${item.title}</h2>
-            <span class="spec-card__meta">${item.category}</span>
           </div>
           <p>${item.description}</p>
         </button>
