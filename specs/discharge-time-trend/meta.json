@@ -1,0 +1,19 @@
+{
+  "title": "Discharge Time Trend",
+  "category": "Flow",
+  "description": "Run chart with y-axis in clock format.",
+  "language": "vega-lite",
+  "tags": ["flow"],
+  "inputs": [
+    {
+      "name": "discharge_month",
+      "type": "datetime",
+      "description": "Date at which the discharge time measure has been evaluated. The granularity of this field can be changed from month to quarter, week etc."
+    },
+    {
+      "name": "avg_discharge_hour",
+      "type": "decimal",
+      "description": "Measure that calculates average discharge time as a decimal hour, for example 13.9 for 13:54."
+    }
+  ]
+}
