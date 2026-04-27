@@ -2,6 +2,7 @@
   "title": "Interactive Appt Browser",
   "category": "Scheduling",
   "description": "Browse appointment slots by resource, with pan and zooming.",
+  "language": "vega",
   "tags": ["gantt", "appointments"],
   "inputs": [
     {

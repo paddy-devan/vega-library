@@ -2,6 +2,7 @@
   "title": "Live Theatres Tracker",
   "category": "Scheduling",
   "description": "Live operating theatre activity by theatre and session.",
+  "language": "vega",
   "tags": ["gantt", "appointments", "theatres", "operations"],
   "inputs": [
     {
