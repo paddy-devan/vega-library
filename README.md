@@ -16,6 +16,8 @@ specs/
 
 Note that the sample data here is used to populate the example gallery.
 
+`meta.json` must include a `language` value of either `vega` or `vega-lite`. Specs should use the Deneb-compatible dataset placeholder named `dataset`; the site replaces that placeholder with `sample-data.json` when rendering previews.
+
 Everybody is welcome to create a PR with their own folder, copying the structure of an existing one!
 
 ## Local development
