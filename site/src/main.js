@@ -145,16 +145,26 @@ function getSelectedSpec(specs) {
 
 function readHashSlug() {
   const hash = window.location.hash.replace(/^#\/?/, "");
-  state.slug = hash || null;
+  const slug = catalog.specs.some((item) => item.slug === hash) ? hash : null;
+  state.slug = slug;
+  state.quickPreviewSlug = slug;
 }
 
 function updateHash(slug) {
-  if (!slug) {
-    history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  const nextUrl = slug
+    ? `${window.location.pathname}${window.location.search}#${slug}`
+    : `${window.location.pathname}${window.location.search}`;
+
+  if (`${window.location.pathname}${window.location.search}${window.location.hash}` === nextUrl) {
     return;
   }
 
-  window.location.hash = slug;
+  if (!slug) {
+    history.pushState(null, "", nextUrl);
+    return;
+  }
+
+  history.pushState(null, "", nextUrl);
 }
 
 function renderFilters() {
@@ -859,16 +869,20 @@ function attachEvents(root) {
   root.addEventListener("click", async (event) => {
     const closeQuickPreviewButton = event.target.closest("[data-close-quick-preview]");
     if (closeQuickPreviewButton) {
+      state.slug = null;
       state.quickPreviewSlug = null;
       state.quickPreviewInspectorTab = null;
+      updateHash(null);
       await renderQuickPreview();
       return;
     }
 
     const quickPreviewBackdrop = event.target.closest("[data-quick-preview-backdrop]");
     if (quickPreviewBackdrop && event.target === quickPreviewBackdrop) {
+      state.slug = null;
       state.quickPreviewSlug = null;
       state.quickPreviewInspectorTab = null;
+      updateHash(null);
       await renderQuickPreview();
       return;
     }
@@ -899,8 +913,10 @@ function attachEvents(root) {
 
     const specButton = event.target.closest("[data-slug]");
     if (specButton) {
+      state.slug = specButton.dataset.slug;
       state.quickPreviewSlug = specButton.dataset.slug;
       state.quickPreviewInspectorTab = null;
+      updateHash(state.quickPreviewSlug);
       await renderQuickPreview();
       return;
     }
@@ -966,9 +982,10 @@ async function rerenderPreview() {
   }
 }
 
-window.addEventListener("hashchange", async () => {
+window.addEventListener("popstate", async () => {
   readHashSlug();
-  await updateView();
+  state.quickPreviewInspectorTab = null;
+  await renderQuickPreview();
 });
 
 window.addEventListener("keydown", async (event) => {
@@ -976,8 +993,10 @@ window.addEventListener("keydown", async (event) => {
     return;
   }
 
+  state.slug = null;
   state.quickPreviewSlug = null;
   state.quickPreviewInspectorTab = null;
+  updateHash(null);
   await renderQuickPreview();
 });
 
