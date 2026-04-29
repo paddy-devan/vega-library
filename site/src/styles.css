@@ -457,7 +457,7 @@ pre {
 
 .quick-preview-panel {
   position: relative;
-  width: min(1120px, 100%);
+  width: min(980px, 100%);
   display: block;
   min-width: 0;
   padding: 16px;

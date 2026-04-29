@@ -115,6 +115,22 @@ function getSpecs() {
   });
 }
 
+function getMaxGridColumnsForViewport() {
+  if (window.innerWidth <= 720) {
+    return 1;
+  }
+
+  if (window.innerWidth <= 960) {
+    return 2;
+  }
+
+  return 3;
+}
+
+function getEffectiveGridColumns() {
+  return Math.min(state.gridColumns, getMaxGridColumnsForViewport());
+}
+
 function findSelectedSpec(specs) {
   if (state.slug) {
     return specs.find((item) => item.slug === state.slug) ?? null;
@@ -177,9 +193,9 @@ function renderFilters() {
                   class="column-toggle__button${state.gridColumns === columns ? " is-active" : ""}"
                   type="button"
                   data-grid-columns="${columns}"
-                  aria-label="${columns} ${columns === 1 ? "column" : "columns"}"
+                  aria-label="Up to ${columns} ${columns === 1 ? "column" : "columns"}"
                   aria-pressed="${state.gridColumns === columns}"
-                  title="${columns} ${columns === 1 ? "column" : "columns"}"
+                  title="Up to ${columns} ${columns === 1 ? "column" : "columns"}"
                 >
                   <span
                     class="column-toggle__icon column-toggle__icon--${columns}"
@@ -572,6 +588,15 @@ function getShell() {
   };
 }
 
+function updateGridColumnsStyle() {
+  const specListSlot = document.querySelector("#spec-list-slot");
+  if (!specListSlot) {
+    return;
+  }
+
+  specListSlot.style.setProperty("--grid-columns", getEffectiveGridColumns());
+}
+
 function getSelectedSpecFromView() {
   const specs = getSpecs();
   return getSelectedSpec(specs);
@@ -926,7 +951,7 @@ async function updateView() {
 
   if (shell.list) {
     shell.list.innerHTML = renderSpecList(specs);
-    shell.list.style.setProperty("--grid-columns", state.gridColumns);
+    updateGridColumnsStyle();
     await renderCardPreviews();
   }
 
@@ -934,6 +959,7 @@ async function updateView() {
 }
 
 async function rerenderPreview() {
+  updateGridColumnsStyle();
   await renderCardPreviews({ force: true });
   if (getQuickPreviewSpec()) {
     await renderPreview(getQuickPreviewSpec(), "#quick-preview-vega", "#quick-preview-vega-frame");
